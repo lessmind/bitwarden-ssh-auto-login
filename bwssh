@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+if [[ "$(which bw)" == "" ]]; then
+	echo >&2 "bw command required!"
+	echo >&2 "Install via https://github.com/bitwarden/cli"
+	return
+fi
+
+cmd=${@:1}
+useConf=0
+confLine=""
+
+confirmBwssh() {
+	read -p "Exec [$cmd] with bitwarden credential? [Y/n] " confirm </dev/tty
+	echo ''
+	if [[ "$confirm" == "" || "$confirm" == "Y" || "$confirm" == "y" ]]; then
+		echo 1
+	elif [[ "$confirm" == "N" || "$confirm" == "n" ]]; then
+		echo 0
+	else
+		confirmBwssh
+	fi
+}
+
+extractJson() {
+	local json=$1
+	local key=$2
+	node -e "var tmp=${json}; console.log(tmp.${key} || '')"
+}
+
+doBwssh() {
+	host=$1
+	objectId=$2
+
+	# ensure login
+	local sessionId=$(bw login --raw || echo failed)
+	if [[ "$(echo "$sessionId" | tail -1)" == "failed" ]]; then
+		if [[ "$(echo "$sessionId" | grep '^You are already logged in')" == "" ]]; then
+			echo "Login failed: $(echo "$sessionId" | head -n -1)"
+			return
+		fi
+	else
+		export BW_SESSION="$sessionId"
+	fi
+
+	# unlock if no session
+	if [[ "${BW_SESSION}" == "" ]]; then
+		local sessionId=$(bw unlock --raw || echo failed)
+		if [[ "$(echo "$sessionId" | tail -1)" == "failed" ]]; then
+			echo "Unlock failed: $(echo "$sessionId" | head -n -1)"
+			return
+		else
+			export BW_SESSION="$sessionId"
+		fi
+	fi
+
+	# try get
+	local secret=$(bw get item $objectId || echo failed)
+	if [[ "$(echo "$secret" | tail -1)" == "failed" ]]; then
+		echo "Get item failed: $(echo "$secret" | head -n -1)"
+		echo "(might be duplicated bw session, auto clear old session, just retry)"
+		unset BW_SESSION
+		return
+	else
+		local password=$(extractJson "$secret" login.password)
+		local totp=$(extractJson "$secret" login.totp)
+		if [[ "$totp" != "" ]]; then
+			if [[ "$(which oathtool)" == "" ]]; then
+				echo >&2 "oathtool command required to generate totp 2fa pin"
+				echo >&2 "Install via: apt install oathtool"
+				return
+			fi
+			local pin=$(oathtool -b --totp $totp)
+		fi
+		if [[ "$(which expect)" == "" ]]; then
+			echo >&2 "expect command required!"
+			echo >&2 "Install via: apt install expect"
+			return
+		fi
+		expect ${SCRIPT_DIR}/bwssh.expect "$cmd" "$password" "$pin"
+	fi
+}
+
+if [[ ! -f ~/.bwssh ]]; then
+	echo >&2 "Waring: This command only works when ssh host & bitwarden object id specified in ~/.bwssh"
+	$cmd
+	return
+fi
+
+while read line; do
+	conf=($(echo $line | tr ',' "\n"))
+	host=${conf[0]}
+	objectId=${conf[1]}
+	if [[ "$host" == "" || "$objectId" == "" ]]; then
+		continue
+	fi
+	if [[ "$(echo $cmd | grep $host)" != "" ]]; then
+		if [[ "$(confirmBwssh | tail -1)" == "1" ]]; then
+			useConf=1
+			confLine=$line
+		fi
+	fi
+done < ~/.bwssh
+
+if [[ "$useConf" == "0" ]]; then
+	$cmd
+else
+	doBwssh $confLine
+fi

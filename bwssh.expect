@@ -1,0 +1,13 @@
+set timeout 20
+set cmd [lindex $argv 0]
+set password [lindex $argv 1]
+set totp [lindex $argv 2]
+puts "$cmd $password $totp"
+spawn {*}$cmd
+expect "assword:"
+send -- "$password\n"
+if { [ string length $totp ] != 0 } {
+	expect "erification code:"
+	send -- "${totp}\n"
+}
+interact
