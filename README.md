@@ -31,6 +31,7 @@ alias ssh='. bwssh ssh'
 alias scp='. bwssh scp'
 # or any other command requires ssh login
 ```
+use `.` for exporting `BW_SESSION` to current shell
 
 ## Configuration
 Vim `~/.bwssh`
