@@ -37,6 +37,7 @@ use `.` for exporting `BW_SESSION` to current shell
 Vim `~/.bwssh`
 ```shell
 # [ssh host] [bitwarden object id]
+# comment starts with '#'
 ssh1.example.com 00000000-0000-0000-0000-000000000001
 ssh2.example.com 00000000-0000-0000-0000-000000000002
 ssh3.example.com 00000000-0000-0000-0000-000000000003
