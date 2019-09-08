@@ -1,18 +1,29 @@
 # bitwarden-ssh-auto-login
 Auto ssh login with bitwarden saved password &amp; totp pin
 
+# Features
+1. Will auto prompt for bitwarden login/unlock (using `bw` of https://github.com/bitwarden/cli)
+2. Get item from bitwarden with matching domain and auto fill password with `expect`
+3. Auto fill TOTP pin with `oathtool` computed result if available
+4. Decode bitwarden json result with `node`
+
+# Note
+Only tested on ubunto & bash
+
 # Requirements
-1. `bw` from https://github.com/bitwarden/cli
-2. `expect` from https://core.tcl-lang.org/expect/index
-3. `oathtool` from https://www.nongnu.org/oath-toolkit/
+1. `bw` of https://github.com/bitwarden/cli
+2. `expect` of https://core.tcl-lang.org/expect/index
+3. `oathtool` of https://www.nongnu.org/oath-toolkit/
+4. `node` of https://nodejs.org/en/
 
 # Installation
+## Download
 ```shell
 git clone https://github.com/lessmind/bitwarden-ssh-auto-login.git
 ln -s bitwarden-ssh-auto-login/bwssh ~/bin/ # or any other dir in $PATH
 ```
 
-# Alias
+## Alias
 Add alias in .bashrc or other equivalent files
 ```shell
 alias ssh='. bwssh ssh'
@@ -20,7 +31,7 @@ alias scp='. bwssh scp'
 # or any other command requires ssh login
 ```
 
-# Configuration
+## Configuration
 Vim `~/.bwssh`
 ```shell
 # [ssh host] [bitwarden object id]
