@@ -26,6 +26,11 @@ confirmBwssh() {
 extractJson() {
 	local json=$1
 	local key=$2
+	if [[ "$(which node)" == "" ]]; then
+		echo >&2 "node command required!"
+		echo >&2 "Install via https://nodejs.org/en/"
+		return
+	fi
 	node -e "var tmp=${json}; console.log(tmp.${key} || '')"
 }
 
