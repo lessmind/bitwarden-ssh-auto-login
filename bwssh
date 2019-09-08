@@ -89,6 +89,9 @@ if [[ ! -f ~/.bwssh ]]; then
 fi
 
 while read line; do
+	if [[ "$(echo $line | grep '^#')" != "" ]]; then
+		continue
+	fi
 	conf=($(echo $line | tr ',' "\n"))
 	host=${conf[0]}
 	objectId=${conf[1]}
