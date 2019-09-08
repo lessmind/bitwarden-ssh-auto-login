@@ -8,7 +8,7 @@ Auto ssh login with bitwarden saved password &amp; totp pin
 4. Decode bitwarden json result with `node`
 
 # Note
-1. Only tested on ubunto & bash
+1. Only tested on ubuntu & bash
 2. Bitwarden session will be expired after current terminal session ended or any new `bw unlock` execution
 
 # Requirements
