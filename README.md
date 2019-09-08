@@ -9,7 +9,7 @@ Auto ssh login with bitwarden saved password &amp; totp pin
 
 # Note
 1. Only tested on ubunto & bash
-2. Bitwarden session will be expired after current terminal session or any new unlock
+2. Bitwarden session will be expired after current terminal session ended or any new `bw unlock` execution
 
 # Requirements
 1. `bw` of https://github.com/bitwarden/cli
