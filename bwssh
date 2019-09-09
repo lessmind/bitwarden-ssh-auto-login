@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo "Bitwarden ssh wrapper 0.0.1"
+echo "Bitwarden ssh auto login wrapper 0.0.1"
 SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
 if [[ "$(which bw)" == "" ]]; then
