@@ -21,7 +21,8 @@ Auto ssh login with bitwarden saved password &amp; totp pin
 ## Download
 ```shell
 git clone https://github.com/lessmind/bitwarden-ssh-auto-login.git
-ln -s bitwarden-ssh-auto-login/bwssh ~/bin/ # or any other dir in $PATH
+cd ~/bin/ # or any other dir in $PATH
+ln -s /path/to/bitwarden-ssh-auto-login/bwssh
 ```
 
 ## Alias
